@@ -546,6 +546,13 @@ body {
 }
 .footer-ig a { color: var(--rose); font-weight: 500; text-decoration: none; }
 .footer-ig a:hover { text-decoration: underline; }
+.footer-contact {
+  color: var(--muted);
+  font-size: 0.84rem;
+  margin-top: 0.5rem;
+}
+.footer-contact a { color: var(--rose); font-weight: 500; text-decoration: none; }
+.footer-contact a:hover { text-decoration: underline; }
 
 /* ── FESTIVAL BANNER ───────────────────────────────────── */
 .festival-banner {
