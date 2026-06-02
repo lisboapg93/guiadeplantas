@@ -5,12 +5,10 @@
   --rose-pale:  #FDE8EF;
   --blush:      #FAE4EC;
   --petal:      #F4AABB;
-  --cream:      #FFF7F9;
   --text:       #2D1218;
   --muted:      #A07080;
   --white:      #FFFFFF;
   --radius:     14px;
-  --shadow:     0 4px 24px rgba(180,60,90,0.13);
   --shadow-card:0 2px 16px rgba(180,60,90,0.10);
 }
 
@@ -22,6 +20,18 @@ body {
   color: var(--text);
   min-height: 100vh;
   overflow-x: hidden;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button:focus-visible,
+input:focus-visible,
+a:focus-visible {
+  outline: 3px solid rgba(184,57,78,0.35);
+  outline-offset: 3px;
 }
 
 /* ── PETALS ────────────────────────────────────────────── */
@@ -119,7 +129,6 @@ body {
   line-height: 1;
   text-shadow: 0 2px 12px rgba(180,60,90,0.15);
 }
-.hero-text {}
 
 .hero-subtitle {
   font-family: 'DM Sans', sans-serif;
@@ -291,7 +300,12 @@ body {
   border-radius: var(--radius);
   overflow: hidden;
   box-shadow: var(--shadow-card);
+  color: inherit;
   cursor: pointer;
+  display: block;
+  font: inherit;
+  text-align: left;
+  width: 100%;
   transition: transform 0.2s, box-shadow 0.2s;
   animation: fadeUp 0.3s ease both;
   -webkit-tap-highlight-color: transparent;
@@ -478,6 +492,7 @@ body {
 .detail-tile.t-amb   { border-left-color: #82c87a; background: #edfaeb; }
 .detail-tile.t-poda  { border-left-color: #f0a060; background: #fef3e6; }
 .detail-tile.t-adubo { border-left-color: var(--petal); background: var(--rose-pale); }
+.detail-tile-wide { grid-column: 1 / -1; }
 
 .detail-tile-head {
   display: flex;
@@ -504,6 +519,7 @@ body {
 }
 .empty-icon { font-size: 3rem; margin-bottom: 0.75rem; }
 .empty p { font-size: 0.95rem; }
+.is-hidden { display: none; }
 
 /* ── FOOTER ────────────────────────────────────────────── */
 .footer {
@@ -624,3 +640,13 @@ body {
 }
 .back-to-top:hover { background: var(--rose-deep); transform: translateY(-2px); }
 .back-to-top:active { transform: translateY(0); }
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    scroll-behavior: auto !important;
+    transition: none !important;
+  }
+}

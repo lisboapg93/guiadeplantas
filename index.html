@@ -18,7 +18,7 @@
 </div>
 
 <!-- HERO -->
-<div class="hero">
+<header class="hero">
   <div class="hero-inner">
     <div class="hero-top">
       <div class="hero-icon">🌸</div>
@@ -32,10 +32,10 @@
   <svg class="hero-wave" viewBox="0 0 1440 48" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
     <path d="M0,0 C360,48 1080,48 1440,0 L1440,48 L0,48 Z" fill="#FAE4EC"/>
   </svg>
-</div>
+</header>
 
 <!-- MAIN -->
-<div class="shell">
+<main class="shell">
 
   <!-- FESTIVAL BANNER -->
   <div class="festival-banner">
@@ -55,7 +55,7 @@
              placeholder="Busque: Alecrim, Orquídea, Kalanchoe…" autocomplete="off">
     </div>
     <div class="filter-btn-wrap">
-      <button class="filter-btn" id="filterToggle" onclick="toggleFilters()">
+      <button class="filter-btn" id="filterToggle" type="button" aria-expanded="false" aria-controls="filterPanel">
         <span>⚙️</span> Filtros
       </button>
     </div>
@@ -63,7 +63,7 @@
   </div>
 
   <!-- FILTER PANEL -->
-  <div class="filter-panel" id="filterPanel">
+  <div class="filter-panel" id="filterPanel" hidden>
     <div class="filter-group">
       <label>Ambiente</label>
       <div class="chip-list" id="ambienteChips"></div>
@@ -76,33 +76,33 @@
 
   <!-- GRID -->
   <div class="plant-grid" id="plantGrid"></div>
-  <div class="empty" id="emptyState" style="display:none">
+  <div class="empty is-hidden" id="emptyState">
     <div class="empty-icon">🍂</div>
     <p>Nenhuma planta encontrada.<br>Tente outro termo ou ajuste os filtros.</p>
   </div>
 
-</div>
+</main>
 
 <!-- FOOTER -->
-<div class="footer">
+<footer class="footer">
   <p class="footer-title">Nossos parceiros</p>
   <div class="partner-list">
-    <a class="partner-link" href="https://www.instagram.com/brechodaamizade_/" target="_blank">Brechó da Amizade</a>
-    <a class="partner-link" href="https://www.instagram.com/olariadoamarildo/" target="_blank">Olaria do Amarildo</a>
-    <a class="partner-link" href="https://www.instagram.com/arteepaisagemoficial/" target="_blank">Arte e Paisagem</a>
-    <a class="partner-link" href="https://www.instagram.com/unifloresholambra/" target="_blank">Uniflores</a>
+    <a class="partner-link" href="https://www.instagram.com/brechodaamizade_/" target="_blank" rel="noopener noreferrer">Brechó da Amizade</a>
+    <a class="partner-link" href="https://www.instagram.com/olariadoamarildo/" target="_blank" rel="noopener noreferrer">Olaria do Amarildo</a>
+    <a class="partner-link" href="https://www.instagram.com/arteepaisagemoficial/" target="_blank" rel="noopener noreferrer">Arte e Paisagem</a>
+    <a class="partner-link" href="https://www.instagram.com/unifloresholambra/" target="_blank" rel="noopener noreferrer">Uniflores</a>
   </div>
-  <p class="footer-ig">📸 Acompanhe: <a href="https://www.instagram.com/floresdeholambraslz/" target="_blank">@floresdeholambraslz</a></p>
+  <p class="footer-ig">📸 Acompanhe: <a href="https://www.instagram.com/floresdeholambraslz/" target="_blank" rel="noopener noreferrer">@floresdeholambraslz</a></p>
   <p class="footer-contact">Dúvidas? Envie um email para <a href="mailto:floresdeholambraslz@gmail.com">floresdeholambraslz@gmail.com</a></p>
-</div>
+</footer>
 
 <!-- MODAL -->
-<div class="overlay" id="overlay" onclick="closeModal(event)">
-  <div class="modal" id="modal">
+<div class="overlay" id="overlay">
+  <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalName" tabindex="-1">
     <div class="modal-banner">
       <div class="modal-banner-icon" id="modalIcon"></div>
       <div class="modal-title" id="modalName"></div>
-      <button class="modal-close" onclick="closeModal()">✕</button>
+      <button class="modal-close" id="modalClose" type="button" aria-label="Fechar detalhes">✕</button>
     </div>
     <div class="modal-body">
       <div class="detail-grid" id="modalDetails"></div>

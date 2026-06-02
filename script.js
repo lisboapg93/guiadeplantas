@@ -100,28 +100,57 @@ function norm(s) {
   return (s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
 }
 
-let activeAmbiente = new Set();
-let activeExpos    = new Set();
+const activeAmbiente = new Set();
+const activeExpos    = new Set();
+
+const els = {
+  searchInput: document.getElementById("searchInput"),
+  filterToggle: document.getElementById("filterToggle"),
+  filterPanel: document.getElementById("filterPanel"),
+  ambienteChips: document.getElementById("ambienteChips"),
+  exposicaoChips: document.getElementById("exposicaoChips"),
+  resultsCount: document.getElementById("resultsCount"),
+  plantGrid: document.getElementById("plantGrid"),
+  emptyState: document.getElementById("emptyState"),
+  overlay: document.getElementById("overlay"),
+  modal: document.getElementById("modal"),
+  modalClose: document.getElementById("modalClose"),
+  modalIcon: document.getElementById("modalIcon"),
+  modalName: document.getElementById("modalName"),
+  modalDetails: document.getElementById("modalDetails"),
+  backToTop: document.getElementById("backToTop"),
+};
+
+let lastFocusedElement = null;
 
 const ambienteValues = [...new Set(PLANTS.map(p => p.ambiente).filter(Boolean))].sort();
 const exposValues    = [...new Set(PLANTS.map(p => p.exposicao).filter(Boolean))].sort();
 
+function createElement(tag, className, text) {
+  const el = document.createElement(tag);
+  if (className) el.className = className;
+  if (text !== undefined) el.textContent = text;
+  return el;
+}
+
 function buildChips(container, values, activeSet) {
-  const el = document.getElementById(container);
   values.forEach(v => {
-    const c = document.createElement("span");
-    c.className = "chip";
-    c.textContent = v;
+    const c = createElement("button", "chip", v);
+    c.type = "button";
+    c.setAttribute("aria-pressed", "false");
     c.addEventListener("click", () => {
-      if (activeSet.has(v)) { activeSet.delete(v); c.classList.remove("selected"); }
-      else { activeSet.add(v); c.classList.add("selected"); }
+      const selected = activeSet.has(v);
+      if (selected) activeSet.delete(v);
+      else activeSet.add(v);
+      c.classList.toggle("selected", !selected);
+      c.setAttribute("aria-pressed", String(!selected));
       render();
     });
-    el.appendChild(c);
+    container.appendChild(c);
   });
 }
-buildChips("ambienteChips",  ambienteValues, activeAmbiente);
-buildChips("exposicaoChips", exposValues,    activeExpos);
+buildChips(els.ambienteChips,  ambienteValues, activeAmbiente);
+buildChips(els.exposicaoChips, exposValues,    activeExpos);
 
 function badgeClass(amb) {
   const a = (amb || "").toLowerCase();
@@ -132,93 +161,110 @@ function badgeLabel(amb) {
   return a === "interno" ? "🏠 Interno" : a === "externo" ? "☀️ Externo" : "🌐 Ambos";
 }
 
+function createInfoRow(icon, label, value) {
+  const row = createElement("span", "info-row");
+  row.append(
+    createElement("span", "info-icon", icon),
+    createElement("span", "info-label", label),
+    createElement("span", "info-val", value || "-")
+  );
+  return row;
+}
+
+function createPlantCard(plant, index) {
+  const card = createElement("button", "plant-card");
+  card.type = "button";
+  card.style.animationDelay = `${Math.min(index, 20) * 30}ms`;
+  card.setAttribute("aria-label", `Ver cuidados de ${plant.planta}`);
+  card.addEventListener("click", () => openModal(plant));
+
+  const header = createElement("span", "card-header");
+  header.append(
+    createElement("span", "card-name", plant.planta),
+    createElement("span", `badge ${badgeClass(plant.ambiente)}`, badgeLabel(plant.ambiente))
+  );
+
+  const body = createElement("span", "card-body");
+  body.append(
+    createInfoRow("☀️", "Sol", plant.exposicao),
+    createInfoRow("💧", "Rega", plant.rega),
+    createInfoRow("✂️", "Poda", plant.poda)
+  );
+
+  card.append(header, body);
+  return card;
+}
+
 function render() {
-  const q     = norm(document.getElementById("searchInput").value);
-  const grid  = document.getElementById("plantGrid");
-  const empty = document.getElementById("emptyState");
+  const q = norm(els.searchInput.value);
   let results = PLANTS;
   if (q) results = results.filter(p => norm(p.planta).includes(q));
   if (activeAmbiente.size) results = results.filter(p => activeAmbiente.has(p.ambiente));
   if (activeExpos.size)    results = results.filter(p => activeExpos.has(p.exposicao));
-  document.getElementById("resultsCount").textContent =
+  els.resultsCount.textContent =
     results.length ? `${results.length} planta${results.length > 1 ? "s" : ""}` : "";
-  if (!results.length) { grid.innerHTML = ""; empty.style.display = "block"; return; }
-  empty.style.display = "none";
-  grid.innerHTML = results.map((p, i) => `
-    <div class="plant-card" style="animation-delay:${Math.min(i, 20) * 30}ms"
-         onclick="openModal('${p.planta.replace(/'/g, "\\'")}')">
-      <div class="card-header">
-        <div class="card-name">${p.planta}</div>
-        <span class="badge ${badgeClass(p.ambiente)}">${badgeLabel(p.ambiente)}</span>
-      </div>
-      <div class="card-body">
-        <div class="info-row"><span class="info-icon">☀️</span><span class="info-label">Sol</span><span class="info-val">${p.exposicao}</span></div>
-        <div class="info-row"><span class="info-icon">💧</span><span class="info-label">Rega</span><span class="info-val">${p.rega}</span></div>
-        <div class="info-row"><span class="info-icon">✂️</span><span class="info-label">Poda</span><span class="info-val">${p.poda || "-"}</span></div>
-      </div>
-    </div>`).join("");
+
+  els.plantGrid.replaceChildren(...results.map(createPlantCard));
+  els.emptyState.classList.toggle("is-hidden", results.length > 0);
 }
 
-function openModal(name) {
-  const p = PLANTS.find(x => x.planta === name);
-  if (!p) return;
-  document.getElementById("modalIcon").textContent = getEmoji(p.planta);
-  document.getElementById("modalName").textContent = p.planta;
-  document.getElementById("modalDetails").innerHTML = `
-    <div class="detail-tile">
-      <div class="detail-tile-head"><span>☀️</span> Exposição ao Sol</div>
-      <div class="detail-tile-val">${p.exposicao || "-"}</div>
-    </div>
-    <div class="detail-tile t-rega">
-      <div class="detail-tile-head"><span>💧</span> Rega</div>
-      <div class="detail-tile-val">${p.rega || "-"}</div>
-    </div>
-    <div class="detail-tile t-amb">
-      <div class="detail-tile-head"><span>🏡</span> Ambiente</div>
-      <div class="detail-tile-val">${p.ambiente || "-"}</div>
-    </div>
-    <div class="detail-tile t-poda">
-      <div class="detail-tile-head"><span>✂️</span> Poda</div>
-      <div class="detail-tile-val">${p.poda || "-"}</div>
-    </div>
-    <div class="detail-tile t-adubo" style="grid-column:1/-1">
-      <div class="detail-tile-head"><span>🌱</span> Adubo / Substrato</div>
-      <div class="detail-tile-val">${p.adubo || "Não informado"}</div>
-    </div>`;
-  document.getElementById("overlay").classList.add("open");
+function createDetailTile(icon, title, value, extraClass = "") {
+  const tile = createElement("div", `detail-tile ${extraClass}`.trim());
+  const head = createElement("div", "detail-tile-head");
+  head.append(createElement("span", "", icon), document.createTextNode(` ${title}`));
+  tile.append(head, createElement("div", "detail-tile-val", value || "-"));
+  return tile;
+}
+
+function openModal(plant) {
+  lastFocusedElement = document.activeElement;
+  els.modalIcon.textContent = getEmoji(plant.planta);
+  els.modalName.textContent = plant.planta;
+  els.modalDetails.replaceChildren(
+    createDetailTile("☀️", "Exposição ao Sol", plant.exposicao),
+    createDetailTile("💧", "Rega", plant.rega, "t-rega"),
+    createDetailTile("🏡", "Ambiente", plant.ambiente, "t-amb"),
+    createDetailTile("✂️", "Poda", plant.poda, "t-poda"),
+    createDetailTile("🌱", "Adubo / Substrato", plant.adubo || "Não informado", "t-adubo detail-tile-wide")
+  );
+  els.overlay.classList.add("open");
   document.body.style.overflow = "hidden";
+  els.modal.focus();
 }
 
-function closeModal(e) {
-  if (e && e.target !== document.getElementById("overlay")) return;
-  document.getElementById("overlay").classList.remove("open");
+function closeModal() {
+  els.overlay.classList.remove("open");
   document.body.style.overflow = "";
+  if (lastFocusedElement) lastFocusedElement.focus();
 }
 
 document.addEventListener("keydown", e => {
-  if (e.key === "Escape") {
-    document.getElementById("overlay").classList.remove("open");
-    document.body.style.overflow = "";
-  }
+  if (e.key === "Escape" && els.overlay.classList.contains("open")) closeModal();
 });
 
 function toggleFilters() {
-  document.getElementById("filterPanel").classList.toggle("open");
-  document.getElementById("filterToggle").classList.toggle("active");
+  const isOpen = els.filterPanel.classList.toggle("open");
+  els.filterPanel.hidden = !isOpen;
+  els.filterToggle.classList.toggle("active", isOpen);
+  els.filterToggle.setAttribute("aria-expanded", String(isOpen));
 }
 
-document.getElementById("searchInput").addEventListener("input", render);
+els.filterToggle.addEventListener("click", toggleFilters);
+els.overlay.addEventListener("click", e => {
+  if (e.target === els.overlay) closeModal();
+});
+els.modalClose.addEventListener("click", closeModal);
+els.searchInput.addEventListener("input", render);
 render();
 
 // Back to top
-const backToTopBtn = document.getElementById("backToTop");
 window.addEventListener("scroll", () => {
   if (window.scrollY > 300) {
-    backToTopBtn.classList.add("visible");
+    els.backToTop.classList.add("visible");
   } else {
-    backToTopBtn.classList.remove("visible");
+    els.backToTop.classList.remove("visible");
   }
 });
-backToTopBtn.addEventListener("click", () => {
+els.backToTop.addEventListener("click", () => {
   window.scrollTo({ top: 0, behavior: "smooth" });
 });
