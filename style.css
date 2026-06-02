@@ -217,8 +217,8 @@ a:focus-visible {
   background: var(--rose);
   color: var(--white);
   font-family: 'DM Sans', sans-serif;
-  font-size: 0.82rem;
-  font-weight: 800;
+  font-size: 0.9rem;
+  font-weight: 500;
   cursor: pointer;
   transition: background 0.2s, color 0.2s, transform 0.2s;
 }
