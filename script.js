@@ -105,6 +105,7 @@ const activeExpos    = new Set();
 
 const els = {
   searchInput: document.getElementById("searchInput"),
+  searchClear: document.getElementById("searchClear"),
   filterToggle: document.getElementById("filterToggle"),
   filterPanel: document.getElementById("filterPanel"),
   ambienteChips: document.getElementById("ambienteChips"),
@@ -197,6 +198,7 @@ function createPlantCard(plant, index) {
 
 function render() {
   const q = norm(els.searchInput.value);
+  els.searchClear.hidden = !q;
   let results = PLANTS;
   if (q) results = results.filter(p => norm(p.planta).includes(q));
   if (activeAmbiente.size) results = results.filter(p => activeAmbiente.has(p.ambiente));
@@ -255,6 +257,11 @@ els.overlay.addEventListener("click", e => {
 });
 els.modalClose.addEventListener("click", closeModal);
 els.searchInput.addEventListener("input", render);
+els.searchClear.addEventListener("click", () => {
+  els.searchInput.value = "";
+  els.searchInput.focus();
+  render();
+});
 render();
 
 // Back to top

@@ -189,7 +189,7 @@ a:focus-visible {
 }
 .search-input {
   width: 100%;
-  padding: 0.8rem 1rem 0.8rem 2.6rem;
+  padding: 0.8rem 5.2rem 0.8rem 2.6rem;
   border: 2px solid transparent;
   border-radius: 99px;
   background: var(--white);
@@ -206,6 +206,30 @@ a:focus-visible {
   box-shadow: 0 0 0 4px rgba(217,90,111,0.12);
 }
 .search-input::placeholder { color: var(--muted); }
+.search-clear {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  border-radius: 99px;
+  padding: 0.42rem 0.75rem;
+  background: var(--rose);
+  color: var(--white);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, transform 0.2s;
+}
+.search-clear:hover,
+.search-clear:focus-visible {
+  background: var(--rose-deep);
+  color: var(--white);
+}
+.search-clear:active {
+  transform: translateY(-50%) scale(0.96);
+}
 
 .filter-btn {
   display: flex;
