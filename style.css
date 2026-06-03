@@ -324,10 +324,12 @@ a:focus-visible {
   border-radius: var(--radius);
   overflow: hidden;
   box-shadow: var(--shadow-card);
+  appearance: none;
   color: inherit;
   cursor: pointer;
   display: block;
   font: inherit;
+  padding: 0;
   text-align: left;
   width: 100%;
   transition: transform 0.2s, box-shadow 0.2s;
