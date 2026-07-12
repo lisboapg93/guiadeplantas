@@ -90,6 +90,31 @@ const EMOJI_MAP = {
   costela:"🌿", dracena:"🌿",
 };
 
+// Cada categoria usa um recorte de uma foto botânica realista. Isso mantém o
+// guia leve sem repetir o mesmo emoji em todos os cards.
+const PHOTO_CATEGORIES = [
+  {
+    name: "cactus",
+    terms: ["cacto", "suculenta", "echeveria", "rosa do deserto", "aloe"],
+  },
+  {
+    name: "fern",
+    terms: ["samambaia", "avenca", "asplenio", "renda portuguesa", "chifre de veado"],
+  },
+  {
+    name: "woody",
+    terms: ["bonsai", "palmeira", "tuia", "podocarpus", "pata de elefante", "buxinho"],
+  },
+  {
+    name: "edible",
+    terms: ["alecrim", "erva", "frutifera", "figo", "uva", "amora", "jabuticaba", "ora pro nobis", "pimenta"],
+  },
+  {
+    name: "flower",
+    terms: ["amaryllis", "anturio", "aphelandra", "azaleia", "begonia", "bromelia", "calla", "celosia", "dianthus", "dipladenia", "geranio", "hibisco", "kalanchoe", "lavanda", "lagrima de cristo", "lirio", "orquidea", "primavera", "rosa", "roseira", "sunpatiens", "torenia", "vinca", "violeta", "flor de maio"],
+  },
+];
+
 function getEmoji(name) {
   const n = name.toLowerCase();
   for (const [k, v] of Object.entries(EMOJI_MAP)) { if (n.includes(k)) return v; }
@@ -98,6 +123,13 @@ function getEmoji(name) {
 
 function norm(s) {
   return (s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+}
+
+function getPhotoCategory(name) {
+  const normalizedName = norm(name);
+  return PHOTO_CATEGORIES.find(({ terms }) =>
+    terms.some(term => normalizedName.includes(term))
+  )?.name || "foliage";
 }
 
 const activeAmbiente = new Set();
@@ -179,6 +211,10 @@ function createPlantCard(plant, index) {
   card.setAttribute("aria-label", `Ver cuidados de ${plant.planta}`);
   card.addEventListener("click", () => openModal(plant));
 
+  const photo = createElement("span", "plant-photo");
+  photo.dataset.category = getPhotoCategory(plant.planta);
+  photo.setAttribute("aria-hidden", "true");
+
   const header = createElement("span", "card-header");
   header.append(
     createElement("span", "card-name", plant.planta),
@@ -192,7 +228,7 @@ function createPlantCard(plant, index) {
     createInfoRow("✂️", "Poda", plant.poda)
   );
 
-  card.append(header, body);
+  card.append(photo, header, body);
   return card;
 }
 

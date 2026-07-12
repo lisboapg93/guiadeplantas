@@ -337,6 +337,22 @@ a:focus-visible {
   -webkit-tap-highlight-color: transparent;
   border: 1.5px solid rgba(217,90,111,0.08);
 }
+
+.plant-photo {
+  display: block;
+  aspect-ratio: 4 / 3;
+  background-image: url('assets/plantas-profissionais.png');
+  background-repeat: no-repeat;
+  background-size: 300% auto;
+  background-position: 50% 10%;
+  transition: transform 0.35s ease;
+}
+.plant-photo[data-category="flower"]  { background-position:   0% 10%; }
+.plant-photo[data-category="foliage"] { background-position:  50% 10%; }
+.plant-photo[data-category="cactus"]  { background-position: 100% 10%; }
+.plant-photo[data-category="edible"]  { background-position:   0% 90%; }
+.plant-photo[data-category="woody"]   { background-position:  50% 90%; }
+.plant-photo[data-category="fern"]    { background-position: 100% 90%; }
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(16px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -347,6 +363,7 @@ a:focus-visible {
     box-shadow: 0 10px 32px rgba(180,60,90,0.18);
     border-color: rgba(217,90,111,0.22);
   }
+  .plant-card:hover .plant-photo { transform: scale(1.04); }
 }
 
 .card-header {
