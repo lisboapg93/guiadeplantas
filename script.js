@@ -106,6 +106,8 @@ function norm(s) {
 
 const activeAmbiente = new Set();
 const activeExpos    = new Set();
+const VISITOR_STORAGE_KEY = "guiadeplantas-visitor-counted-v1";
+const VISITOR_COUNT_URL = "https://guiadeplantas.goatcounter.com/counter/TOTAL.json";
 
 const els = {
   searchInput: document.getElementById("searchInput"),
@@ -124,6 +126,7 @@ const els = {
   modalName: document.getElementById("modalName"),
   modalDetails: document.getElementById("modalDetails"),
   backToTop: document.getElementById("backToTop"),
+  visitorCount: document.getElementById("visitorCount"),
 };
 
 let lastFocusedElement = null;
@@ -283,3 +286,31 @@ window.addEventListener("scroll", () => {
 els.backToTop.addEventListener("click", () => {
   window.scrollTo({ top: 0, behavior: "smooth" });
 });
+
+function showVisitorCount() {
+  fetch(VISITOR_COUNT_URL)
+    .then(response => response.ok ? response.json() : Promise.reject())
+    .then(({ count }) => {
+      if (!count || !els.visitorCount) return;
+      els.visitorCount.textContent = count;
+      els.visitorCount.setAttribute("aria-label", `${count} visitantes únicos`);
+      els.visitorCount.hidden = false;
+    })
+    .catch(() => {});
+}
+
+function recordUniqueVisitor() {
+  try {
+    const isFirstVisit = !localStorage.getItem(VISITOR_STORAGE_KEY);
+    if (isFirstVisit && window.goatcounter?.count) {
+      window.goatcounter.count({ path: location.pathname || "/", title: document.title });
+      localStorage.setItem(VISITOR_STORAGE_KEY, "1");
+    }
+  } catch {
+    // Sem armazenamento local, não registramos a visita para evitar duplicações.
+  }
+
+  showVisitorCount();
+}
+
+window.addEventListener("load", recordUniqueVisitor);
