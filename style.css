@@ -175,11 +175,11 @@ a:focus-visible {
   gap: 0.6rem;
   margin-bottom: 1.1rem;
   align-items: center;
+}
+.controls.is-stuck {
   position: sticky;
   top: 0.65rem;
   z-index: 10;
-}
-.controls.is-stuck {
   grid-template-columns: minmax(0, 720px);
   grid-template-rows: auto;
   justify-content: center;

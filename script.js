@@ -134,7 +134,9 @@ let lastFocusedElement = null;
 let controlsTop = 0;
 
 function updateFloatingSearch() {
-  els.controls.classList.toggle("is-stuck", window.scrollY > controlsTop - 10);
+  const isStuck = window.scrollY > controlsTop - 10;
+  els.controls.classList.toggle("is-stuck", isStuck);
+  if (isStuck) closeFilters();
 }
 
 function measureControlsTop() {
@@ -266,8 +268,35 @@ function closeModal() {
 }
 
 document.addEventListener("keydown", e => {
-  if (e.key === "Escape" && els.overlay.classList.contains("open")) closeModal();
+  if (!els.overlay.classList.contains("open")) return;
+  if (e.key === "Escape") {
+    closeModal();
+    return;
+  }
+  if (e.key !== "Tab") return;
+
+  const focusable = [...els.modal.querySelectorAll(
+    'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+  )];
+  const first = focusable[0];
+  const last = focusable.at(-1);
+  if (!first || !last) return;
+
+  if (e.shiftKey && (document.activeElement === first || document.activeElement === els.modal)) {
+    e.preventDefault();
+    last.focus();
+  } else if (!e.shiftKey && document.activeElement === last) {
+    e.preventDefault();
+    first.focus();
+  }
 });
+
+function closeFilters() {
+  els.filterPanel.classList.remove("open");
+  els.filterPanel.hidden = true;
+  els.filterToggle.classList.remove("active");
+  els.filterToggle.setAttribute("aria-expanded", "false");
+}
 
 function toggleFilters() {
   const isOpen = els.filterPanel.classList.toggle("open");
@@ -297,10 +326,11 @@ window.addEventListener("scroll", () => {
   } else {
     els.backToTop.classList.remove("visible");
   }
-});
+}, { passive: true });
 window.addEventListener("resize", measureControlsTop);
 els.backToTop.addEventListener("click", () => {
-  window.scrollTo({ top: 0, behavior: "smooth" });
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  window.scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" });
 });
 
 function showVisitorCount() {
@@ -333,3 +363,4 @@ window.addEventListener("load", () => {
   measureControlsTop();
   recordUniqueVisitor();
 });
+window.addEventListener("pageshow", measureControlsTop);
