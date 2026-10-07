@@ -138,6 +138,12 @@ a:focus-visible {
   margin-top: 0.25rem;
   letter-spacing: .01em;
 }
+.hero-location {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--rose);
+  margin-top: 0.35rem;
+}
 .hero-wave {
   display: block;
   width: calc(100% + 2.5rem);
