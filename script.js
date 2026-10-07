@@ -110,6 +110,7 @@ const VISITOR_STORAGE_KEY = "guiadeplantas-visitor-counted-v1";
 const VISITOR_COUNT_URL = "https://guiadeplantas.goatcounter.com/counter/TOTAL.json";
 
 const els = {
+  controls: document.querySelector(".controls"),
   searchInput: document.getElementById("searchInput"),
   searchClear: document.getElementById("searchClear"),
   filterToggle: document.getElementById("filterToggle"),
@@ -130,6 +131,19 @@ const els = {
 };
 
 let lastFocusedElement = null;
+let controlsTop = 0;
+
+function updateFloatingSearch() {
+  els.controls.classList.toggle("is-stuck", window.scrollY > controlsTop - 10);
+}
+
+function measureControlsTop() {
+  const wasStuck = els.controls.classList.contains("is-stuck");
+  els.controls.classList.remove("is-stuck");
+  controlsTop = els.controls.getBoundingClientRect().top + window.scrollY;
+  els.controls.classList.toggle("is-stuck", wasStuck);
+  updateFloatingSearch();
+}
 
 const ambienteValues = [...new Set(PLANTS.map(p => p.ambiente).filter(Boolean))].sort();
 const exposValues    = [...new Set(PLANTS.map(p => p.exposicao).filter(Boolean))].sort();
@@ -277,12 +291,14 @@ render();
 
 // Back to top
 window.addEventListener("scroll", () => {
+  updateFloatingSearch();
   if (window.scrollY > 300) {
     els.backToTop.classList.add("visible");
   } else {
     els.backToTop.classList.remove("visible");
   }
 });
+window.addEventListener("resize", measureControlsTop);
 els.backToTop.addEventListener("click", () => {
   window.scrollTo({ top: 0, behavior: "smooth" });
 });
@@ -313,4 +329,7 @@ function recordUniqueVisitor() {
   showVisitorCount();
 }
 
-window.addEventListener("load", recordUniqueVisitor);
+window.addEventListener("load", () => {
+  measureControlsTop();
+  recordUniqueVisitor();
+});

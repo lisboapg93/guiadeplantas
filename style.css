@@ -175,6 +175,21 @@ a:focus-visible {
   gap: 0.6rem;
   margin-bottom: 1.1rem;
   align-items: center;
+  position: sticky;
+  top: 0.65rem;
+  z-index: 10;
+}
+.controls.is-stuck {
+  grid-template-columns: minmax(0, 720px);
+  grid-template-rows: auto;
+  justify-content: center;
+}
+.controls.is-stuck .filter-btn-wrap,
+.controls.is-stuck .results-count {
+  display: none;
+}
+.controls.is-stuck .search-wrap {
+  grid-column: 1;
 }
 .search-wrap    { grid-column: 1; }
 .filter-btn-wrap{ grid-column: 2; }
