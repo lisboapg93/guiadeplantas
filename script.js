@@ -166,7 +166,7 @@ function badgeClass(amb) {
 }
 function badgeLabel(amb) {
   const a = (amb || "").toLowerCase();
-  return a === "interno" ? "🏠 Interno" : a === "externo" ? "☀️ Externo" : "🌐 Ambos";
+  return a === "interno" ? "Casa" : a === "externo" ? "Jardim" : "Casa ou jardim";
 }
 
 function createInfoRow(icon, label, value) {
